@@ -1,10 +1,21 @@
 from pynput import keyboard
 import sys
-import rclpy
+import rclpy,threading
 from rclpy.node import Node 
 from std_msgs.msg import String
-dir={"w":0,"a":-90,"s":180,"d":90,"Key.up":[0,1],"Key.down":[0,-1],"Key.right":[1,0],"Key.left":[-1,0]}
+dir={"w":[0,1],"a":[-1,0],"s":[0,-1],"d":[1,0],"Key.up":[0,1],"Key.down":[0,-1],"Key.right":[1,0],"Key.left":[-1,0]}
+a={"[0, 0]":0,"[0, 1]":0,"[1, 0]":90,"[-1, 0]":-90,"[1, 1]":45,"[-1, 1]":-45,"[1, -1]":135,"[-1, -1]":-135}
 old=["",""]
+send=""
+
+def arc(d):
+    if d==[0,-1]:
+        if 0<old[1]:
+            return 180
+        else:
+            return -180
+    else:
+        return a[str(d)]
 
 class pineapple(Node):
     def __init__(self):
@@ -14,48 +25,53 @@ class pineapple(Node):
         self.timer = self.create_timer(0.1,self.call)
         self.cmd=String()
         self.keys=set()
+        self.start()
 
     def call(self):
-        d=0
-        i=0
+        global send
+        d=[0,0]
         c=[0,0]
+        speed=0
         for key in self.keys:
             if key in list("wasd"):
-                d+=dir[key]
-                i+=1
+                d[0]+=dir[key][0]
+                d[1]+=dir[key][1]
+                speed=500
             elif key[4:] in ["up","down","right","left"]:
                 c[0]+=dir[key][0]
                 c[1]+=dir[key][1]
-        if i!=0:
-            d//=i
         self.cmd.data="#C"+str(c[0]).replace("-1","-").replace("1","+")+str(c[1]).replace("-1","-").replace("1","+")
         if old[0]!=self.cmd.data:
             self.pub.publish(self.cmd)
             old[0]=self.cmd.data
-        self.cmd.data="/cd "+str(d)
-        if old[1]!=self.cmd.data:
+        d=arc(d)
+        self.cmd.data="/cd "+str(d)+" "+str(speed)
+        if old[1]!=d:
             self.pub.publish(self.cmd)
-            old[1]=self.cmd.data
-
+            old[1]=d
+        if send!="":
+            self.cmd.data="/"+send
+            send=""
+            self.pub.publish(self.cmd)
     
     def on_press(self,key):
         try:
-            print('press: {}'.format(key.char))
+            # print('press: {}'.format(key.char))
             self.keys.add(key.char)
         except AttributeError:
-            print('spkey press: {}'.format(key))
+            # print('spkey press: {}'.format(key))
             self.keys.add(str(key))
     
     def on_release(self,key):
         try:
-            print('release: {}'.format(key.char))
+            # print('release: {}'.format(key.char))
             self.keys.remove(key.char)
             if key.char in list("rpceuz"):
                 r=String()
                 r.data="?"+str(key.char)
                 self.pub_n.publish(r)
         except AttributeError:
-            print('release: {}'.format(key))
+            # print('release: {}'.format(key))
             try:
                 self.keys.remove(str(key))
             except:
@@ -76,15 +92,24 @@ class pineapple(Node):
             return False       
         return True
 
+def i():
+    global send
+    while True:
+        send=input("cmd>>> /")
+
 def main():
     rclpy.init()
     node=pineapple()
-    node.start()
-    rclpy.spin(node)
-    while(True):
-        status = node.getstatus()
-        #print(str(status))
-        if(status == False):
-            print("break")
-            break
-    rclpy.shutdown()
+    ex=rclpy.executors.MultiThreadedExecutor()
+    ex.add_node(node)
+    ext=threading.Thread(target=ex.spin,daemon=True)
+    it=threading.Thread(target=i,daemon=True)
+    ext.start()
+    it.start()
+    try:
+        while rclpy.ok():
+            pass
+    except:
+        rclpy.shutdown()
+    ext.join()
+    it.join()
