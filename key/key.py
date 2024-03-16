@@ -36,6 +36,7 @@ class pineapple(Node):
             if key in list("wasd"):
                 d[0]+=dir[key][0]
                 d[1]+=dir[key][1]
+                speed=100
             elif key[4:] in ["up","down","right","left"]:
                 c[0]+=dir[key][0]
                 c[1]+=dir[key][1]
@@ -44,7 +45,7 @@ class pineapple(Node):
             self.pub.publish(self.cmd)
             old[0]=self.cmd.data
         d=arc(d)
-        self.cmd.data="/cd "+str(d)
+        self.cmd.data="/cd "+str(d)+" "+str(speed)
         if old[1]!=d:
             self.pub.publish(self.cmd)
             old[1]=d
