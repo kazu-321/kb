@@ -63,7 +63,6 @@ class pineapple(Node):
     def __init__(self):
         super().__init__("key")
         self.pub=self.create_publisher(String,"cmd",10)
-        self.pub_n=self.create_publisher(String,"nucleo_cmd",10)
         self.timer = self.create_timer(0.1,self.call)
         self.cmd=String()
         self.keys=set()
@@ -119,20 +118,21 @@ class pineapple(Node):
             if key.char in list("rpceuz"):
                 r=String()
                 r.data="?"+str(key.char)
-                self.pub_n.publish(r)
+                self.pub.publish(r)
             try:
                 SoundPlayer.play("/home/kazu/music/"+key.char+".mp3",stop=True)
             except:
                 pass
             if key.char=="@":
-                SoundPlayer.play("/home/kazu/music/bekobeko/be.mp3")
-                SoundPlayer.play("/home/kazu/music/bekobeko/ko.mp3")
-                SoundPlayer.play("/home/kazu/music/bekobeko/be.mp3")
-                SoundPlayer.play("/home/kazu/music/bekobeko/ko.mp3")
-                SoundPlayer.play("/home/kazu/music/bekobeko/tin.mp3")
-                SoundPlayer.play("/home/kazu/music/bekobeko/tin.mp3")
-                SoundPlayer.play("/home/kazu/music/bekobeko/a.mp3")
-                SoundPlayer.play("/home/kazu/music/bekobeko/nko.mp3")
+                # SoundPlayer.play("/home/kazu/music/bekobeko/be.mp3")
+                # SoundPlayer.play("/home/kazu/music/bekobeko/ko.mp3")
+                # SoundPlayer.play("/home/kazu/music/bekobeko/be.mp3")
+                # SoundPlayer.play("/home/kazu/music/bekobeko/ko.mp3")
+                # SoundPlayer.play("/home/kazu/music/bekobeko/tin.mp3")
+                # SoundPlayer.play("/home/kazu/music/bekobeko/tin.mp3")
+                # SoundPlayer.play("/home/kazu/music/bekobeko/a.mp3")
+                # SoundPlayer.play("/home/kazu/music/bekobeko/nko.mp3")
+                SoundPlayer.play("/home/kazu/music/bekobeko.mp3")
         except AttributeError:
             # print('release: {}'.format(key))
             try:
