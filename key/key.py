@@ -86,10 +86,13 @@ class pineapple(Node):
                 c[0]+=dir[key][0]
                 c[1]+=dir[key][1]
             elif key=="f":
-                speed+=100
+                speed+=1000
             elif key=="b":
-                speed-=100
-        self.cmd.data="#C"+str(c[0]).replace("-1","-").replace("1","+")+str(c[1]).replace("-1","-").replace("1","+")
+                speed-=1000
+            elif key in list("nm"):
+                self.cmd.data="#"+key
+                self.pub.publish(self.cmd)
+        self.cmd.data="#c"+str(c[0]).replace("-1","-").replace("1","+")+str(c[1]).replace("-1","-").replace("1","+")
         if old[0]!=self.cmd.data:
             self.pub.publish(self.cmd)
             old[0]=self.cmd.data
