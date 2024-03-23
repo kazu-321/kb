@@ -134,7 +134,7 @@ class pineapple(Node):
                 r.data="?"+str(key.char)
                 self.pub.publish(r)
             try:
-                SoundPlayer.play("/home/kazu/music/"+key.char+".mp3",stop=True)
+                SoundPlayer.play("/home/kazu/music/test/"+key.char+".mp3",stop=True)
             except:
                 pass
             if key.char=="@":
@@ -146,7 +146,7 @@ class pineapple(Node):
                 # SoundPlayer.play("/home/kazu/music/bekobeko/tin.mp3")
                 # SoundPlayer.play("/home/kazu/music/bekobeko/a.mp3")
                 # SoundPlayer.play("/home/kazu/music/bekobeko/nko.mp3")
-                SoundPlayer.play("/home/kazu/music/bekobeko.mp3")
+                SoundPlayer.play("/home/kazu/music/test/bekobeko.mp3")
         except AttributeError:
             # print('release: {}'.format(key))
             try:
@@ -154,7 +154,7 @@ class pineapple(Node):
             except:
                 pass
             try:
-                SoundPlayer.play("/home/kazu/music/"+str(key)+".mp3",stop=True)
+                SoundPlayer.play("/home/kazu/music/test/"+str(key)+".mp3",stop=True)
             except:
                 pass
         except KeyError:
