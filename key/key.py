@@ -6,6 +6,7 @@ from std_msgs.msg import String
 dir={"w":[0,1],"a":[-1,0],"s":[0,-1],"d":[1,0],"Key.up":[0,1],"Key.down":[0,-1],"Key.right":[1,0],"Key.left":[-1,0]}
 a={"[0, 0]":0,"[0, 1]":0,"[1, 0]":90,"[-1, 0]":-90,"[1, 1]":45,"[-1, 1]":-45,"[1, -1]":135,"[-1, -1]":-135}
 old=["",""]
+tinko=["0","0","0","0"] # tinko
 send=""
 d=[0,0]
 arg=0
@@ -72,9 +73,11 @@ class pineapple(Node):
         global send
         global d
         global arg
+        global tinko
         c=[0,0]
         speed=0
         trig=False
+        tinko=["0","0","0","0"] # tinko
         for key in self.keys:
             if key in list("wad"):
                 if not trig:
@@ -92,12 +95,20 @@ class pineapple(Node):
             elif key in list("nm"):
                 self.cmd.data="#"+key
                 self.pub.publish(self.cmd)
+            elif key=="1":
+                tinko[0]="1"
+            elif key=="3":
+                tinko[1]="1"
+            elif key=="7":
+                tinko[2]="1"
+            elif key=="9":
+                tinko[3]="1"
         self.cmd.data="#c"+str(c[0]).replace("-1","-").replace("1","+")+str(c[1]).replace("-1","-").replace("1","+")
         if old[0]!=self.cmd.data:
             self.pub.publish(self.cmd)
             old[0]=self.cmd.data
         arc()
-        self.cmd.data="/cd "+str(arg)+" "+str(speed)
+        self.cmd.data="/cd "+str(arg)+" "+str(speed)+" "+",".join(tinko)
         if old[1]!=self.cmd.data:
             self.pub.publish(self.cmd)
             old[1]=self.cmd.data
@@ -118,7 +129,7 @@ class pineapple(Node):
         try:
             # print('release: {}'.format(key.char))
             self.keys.remove(key.char)
-            if key.char in list("rpceuz"):
+            if key.char in list("pceuz"):
                 r=String()
                 r.data="?"+str(key.char)
                 self.pub.publish(r)
