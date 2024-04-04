@@ -89,19 +89,19 @@ class pineapple(Node):
                 c[0]+=dir[key][0]
                 c[1]+=dir[key][1]
             elif key=="f":
-                speed+=1000
+                speed+=30
             elif key=="b":
-                speed-=1000
+                speed-=30
             elif key in list("nm"):
                 self.cmd.data="#"+key
                 self.pub.publish(self.cmd)
-            elif key=="1":
-                tinko[0]="1"
             elif key=="3":
-                tinko[1]="1"
-            elif key=="7":
-                tinko[2]="1"
+                tinko[0]="1"
             elif key=="9":
+                tinko[1]="1"
+            elif key=="1":
+                tinko[2]="1"
+            elif key=="7":
                 tinko[3]="1"
         self.cmd.data="#c"+str(c[0]).replace("-1","-").replace("1","+")+str(c[1]).replace("-1","-").replace("1","+")
         if old[0]!=self.cmd.data:
@@ -129,7 +129,7 @@ class pineapple(Node):
         try:
             # print('release: {}'.format(key.char))
             self.keys.remove(key.char)
-            if key.char in list("pceuz"):
+            if key.char in list("pcreuz"):
                 r=String()
                 r.data="?"+str(key.char)
                 self.pub.publish(r)
