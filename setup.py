@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'key'
+package_name = 'kb'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'key = key.key:main'
+            'kb = kb.kb:main'
         ],
     },
 )
