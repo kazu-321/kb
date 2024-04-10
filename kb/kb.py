@@ -4,8 +4,10 @@ import rclpy,threading # type: ignore
 from rclpy.node import Node # type: ignore
 from std_msgs.msg import String # type: ignore
 from geometry_msgs.msg import Twist  # type: ignore
-
-send=""
+kb1=list("wasd")
+kb2=["up","down","right","left"]
+kb3=list("cpz")
+send=[]
 
 class kbinput(Node):
     def __init__(self):
@@ -22,6 +24,7 @@ class kbinput(Node):
         global send
         self.vel.linear.x=0.0
         self.vel.linear.y=0.0
+        self.vel.angle.z=0.0
         for key in self.keys:
             if key=="w":
                 self.vel.linear.x+=1.0
@@ -31,24 +34,35 @@ class kbinput(Node):
                 self.vel.linear.x-=1.0
             elif key=="d":
                 self.vel.linear.y-=1.0
+            elif key=="right":
+                self.vel.angle.z-=1.0
+            elif key=="left":
+                self.vel.angle.z+=1.0
+            
         self.velpub.publish(self.vel)
 
-        if send!="":
-            self.cmd.data=send
-            send=""
+        while len(send)!=0:
+            self.cmd.data=send[-1]
+            send.pop(-1)
             self.cmdpub.publish(self.cmd)
     
     def on_press(self,key):
         try:
-            if key.char in list("wasd"):
+            if key.char in kb1:
                 self.keys.add(key.char)
+        except AttributeError:
+            if str(key)[4:] in kb2:
+                self.keys.add(str(key))
         except:
             pass
 
     def on_release(self,key):
         try:
-            if key.char in list("wasd"):
+            if key.char in kb1:
                 self.keys.remove(key.char)
+        except AttributeError:
+            if str(key)[4:] in kb2:
+                self.keys.remove(str(key))
         except:
             pass
         if( key == keyboard.Key.esc):
@@ -68,7 +82,7 @@ class kbinput(Node):
 def i():
     global send
     while True:
-        send=input("cmd>>> /")
+        send.append(input("cmd>>> /"))
 
 
 def main():
