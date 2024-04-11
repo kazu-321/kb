@@ -7,6 +7,7 @@ from geometry_msgs.msg import Twist  # type: ignore
 kb1=list("wasd")
 kb2=["up","down","right","left"]
 kb3=list("cpz")
+kb4=list("8462*")
 send=[]
 
 class kbinput(Node):
@@ -24,7 +25,7 @@ class kbinput(Node):
         global send
         self.vel.linear.x=0.0
         self.vel.linear.y=0.0
-        self.vel.angle.z=0.0
+        self.vel.angular.z=0.0
         for key in self.keys:
             if key=="w":
                 self.vel.linear.x+=1.0
@@ -35,9 +36,9 @@ class kbinput(Node):
             elif key=="d":
                 self.vel.linear.y-=1.0
             elif key=="right":
-                self.vel.angle.z-=1.0
+                self.vel.angular.z-=1.0
             elif key=="left":
-                self.vel.angle.z+=1.0
+                self.vel.angular.z+=1.0
             
         self.velpub.publish(self.vel)
 
@@ -52,17 +53,33 @@ class kbinput(Node):
                 self.keys.add(key.char)
         except AttributeError:
             if str(key)[4:] in kb2:
-                self.keys.add(str(key))
+                self.keys.add(str(key)[4:])
         except:
             pass
 
     def on_release(self,key):
+        global send
         try:
+            # print(key.char)
             if key.char in kb1:
                 self.keys.remove(key.char)
+            elif key.char in kb3:
+                send.append(key.char)
+            elif key.char in kb4:
+                if key.char=="8":
+                    send.append("g 0")
+                elif key.char=="4":
+                    send.append("g -90")
+                elif key.char=="6":
+                    send.append("g 90")
+                elif key.char=="2":
+                    send.append("g 180")
+                elif key.char=="*":
+                    send.append("r")
         except AttributeError:
+            # print(str(key)[4:])
             if str(key)[4:] in kb2:
-                self.keys.remove(str(key))
+                self.keys.remove(str(key)[4:])
         except:
             pass
         if( key == keyboard.Key.esc):
