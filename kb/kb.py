@@ -17,10 +17,21 @@ class kbinput(Node):
         self.cmdpub=self.create_publisher(String,"cmd",10)
         self.velpub=self.create_publisher(Twist,"cmd_vel",10)
         self.timer = self.create_timer(0.01,self.call)
+        self.checker=self.create_timer(2,self.check)
         self.cmd=String()
         self.vel=Twist()
         self.keys=set()
+        self.alive=False
         self.start()
+
+    def check(self):
+        if not self.alive:
+            datas=self.get_subscriptions_info_by_topic("cmd")
+            if "_CREATED_BY_BARE_DDS_APP_" in [data._node_name for data in datas]:
+                print("find!!")
+                self.alive=True
+            else:
+                print("not connected...")
 
     def call(self):
         global send
