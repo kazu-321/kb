@@ -4,11 +4,12 @@ import rclpy,threading # type: ignore
 from rclpy.node import Node # type: ignore
 from std_msgs.msg import String # type: ignore
 from geometry_msgs.msg import Twist  # type: ignore
-kb1=list("wasd")
-kb2=["up","down","right","left"]
+kb1=list("wasdWASD")
+kb2=["up","down","right","left","shift"]
 kb3=list("cpz")
 kb4=list("8462*")
 send=[]
+unko=2
 
 class kbinput(Node):
     def __init__(self):
@@ -23,6 +24,7 @@ class kbinput(Node):
 
     def call(self):
         global send
+        global unko
         self.vel.linear.x=0.0
         self.vel.linear.y=0.0
         self.vel.angular.z=0.0
@@ -30,11 +32,11 @@ class kbinput(Node):
             if key=="w":
                 self.vel.linear.x+=1.0
             elif key=="a":
-                self.vel.linear.y+=1.0
+                self.vel.linear.y-=1.0
             elif key=="s":
                 self.vel.linear.x-=1.0
             elif key=="d":
-                self.vel.linear.y-=1.0
+                self.vel.linear.y+=1.0
             elif key=="right":
                 self.vel.angular.z-=1.0
             elif key=="left":
@@ -48,12 +50,17 @@ class kbinput(Node):
             self.cmdpub.publish(self.cmd)
     
     def on_press(self,key):
+        global send
         try:
             if key.char in kb1:
-                self.keys.add(key.char)
+                self.keys.add(key.char.lower())
         except AttributeError:
             if str(key)[4:] in kb2:
                 self.keys.add(str(key)[4:])
+                if str(key)[4:]=="shift":
+                    send.append("unko 1.25")
+                elif str(key)[4:]=="shift_r":
+                    send.append("unko 3")
         except:
             pass
 
@@ -62,7 +69,7 @@ class kbinput(Node):
         try:
             # print(key.char)
             if key.char in kb1:
-                self.keys.remove(key.char)
+                self.keys.remove(key.char.lower())
             elif key.char in kb3:
                 send.append(key.char)
             elif key.char in kb4:
@@ -80,6 +87,8 @@ class kbinput(Node):
             # print(str(key)[4:])
             if str(key)[4:] in kb2:
                 self.keys.remove(str(key)[4:])
+                if str(key)[4:] in ["shift","shift_r"]:
+                    send.append("unko 2")
         except:
             pass
         if( key == keyboard.Key.esc):
@@ -121,3 +130,6 @@ def main():
         it.join()
     except:
         pass
+
+if __name__=="__main__":
+    main()
