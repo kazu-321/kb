@@ -7,7 +7,7 @@ from geometry_msgs.msg import Twist  # type: ignore
 kb1=list("wasdWASD")
 kb2=["up","down","right","left","shift"]
 kb3=list("cpz")
-kb4=list("8462*")
+kb4=list("8462")
 send=[]
 unko=2
 
