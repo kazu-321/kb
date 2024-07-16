@@ -6,7 +6,7 @@ from std_msgs.msg import String # type: ignore
 from geometry_msgs.msg import Twist  # type: ignore
 kb1=list("wasdWASD")
 kb2=["up","down","right","left","shift"]
-kb3=list("cpz")
+kb3=list("cpznt")
 kb4=list("8462")
 send=[]
 unko=2
@@ -16,13 +16,18 @@ class kbinput(Node):
         super().__init__("key")
         self.cmdpub=self.create_publisher(String,"cmd",10)
         self.velpub=self.create_publisher(Twist,"cmd_vel",10)
+        self.nav=self.create_subscription(Twist,"cmd_vel_nav",self.nav,10)
         self.timer = self.create_timer(0.01,self.call)
         self.checker=self.create_timer(2,self.check)
         self.cmd=String()
         self.vel=Twist()
+        self.vel_nav=Twist()
         self.keys=set()
         self.alive=False
         self.start()
+
+    def nav(self,msg):
+        self.vel_nav=msg
 
     def check(self):
         if not self.alive:
@@ -43,16 +48,20 @@ class kbinput(Node):
             if key=="w":
                 self.vel.linear.x+=1.0
             elif key=="a":
-                self.vel.linear.y-=1.0
+                self.vel.linear.y+=1.0
             elif key=="s":
                 self.vel.linear.x-=1.0
             elif key=="d":
-                self.vel.linear.y+=1.0
+                self.vel.linear.y-=1.0
             elif key=="right":
                 self.vel.angular.z-=1.0
             elif key=="left":
                 self.vel.angular.z+=1.0
-            
+        
+        self.vel.linear.x-=self.vel_nav.linear.x*1.5
+        self.vel.linear.y+=self.vel_nav.linear.y*1.5
+        self.vel.angular.z+=self.vel_nav.angular.z*1.5
+
         self.velpub.publish(self.vel)
 
         while len(send)!=0:
